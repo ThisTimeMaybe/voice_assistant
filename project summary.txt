@@ -1,0 +1,107 @@
+# Voice Assistant using Flask + Hugging Face API
+
+## 📌 Project Overview
+This project builds a simple voice-based question answering assistant using:
+- Flask (web framework)
+- JavaScript (for front-end interaction)
+- Hugging Face Inference API (for NLP responses)
+- HTML/CSS (basic UI)
+
+It captures voice from the user, converts it to text, sends the text to a Q&A model via Hugging Face API, and speaks the response back using text-to-speech.
+
+---
+
+## 🔧 Project Structure
+```
+voice_assistant/
+├── app.py               # Flask app entry point
+├── static/
+│   └── script.js        # Front-end JS logic
+├── templates/
+│   └── index.html       # Web UI
+├── responder.py         # Hugging Face API logic
+├── recorder.py          # Audio recording logic
+├── transcriber.py       # Speech to text
+├── speaker.py           # Text to speech
+└── __init__.py          # (optional init file)
+```
+
+---
+
+## ⚙️ Tools & Libraries Used
+- **Flask** - Python backend web server
+- **SpeechRecognition** - Convert recorded audio to text
+- **pyttsx3** - Text-to-speech response
+- **requests** - Make API calls to Hugging Face
+- **Hugging Face** - Inference API for NLP models (e.g., `google/flan-t5-base`)
+- **JavaScript Web APIs** - For frontend recording and interaction
+
+---
+
+## 🛠️ Steps Taken
+### 1. **Initial Setup**
+- Created `app.py` and a basic Flask server with a web page.
+- Set up `index.html` and `script.js` to handle UI and audio recording.
+
+### 2. **Backend Voice Flow**
+- `recorder.py`: Captures user's voice
+- `transcriber.py`: Converts voice to text using `SpeechRecognition`
+- `responder.py`: Sends the question to Hugging Face API and gets an answer
+- `speaker.py`: Converts answer text to audio using `pyttsx3`
+
+### 3. **Hugging Face Integration**
+- Registered and created an Access Token
+- Chose an appropriate model like `deepset/roberta-base-squad2` (Q&A)
+
+```python
+API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
+```
+
+- Used POST requests to send context + question and receive an answer
+
+### 4. **Problem Faced**
+- Some models returned vague or wrong answers (`san diego`, `paris` for weather, etc.)
+- Larger models like `bigscience/T0pp` failed due to being over the free-tier limit (44GB)
+- Web errors due to JS loops, undefined function calls, etc.
+
+### 5. **Fixes & Workarounds**
+- Switched to lighter, more reliable models like `google/flan-t5-base`
+- Rewrote `responder.py` to use Hugging Face API correctly
+- Added clear error handling for API failures
+
+---
+
+## ✅ Final Working Flow
+1. User speaks a question (e.g., "What is the capital of India?")
+2. Voice is recorded and transcribed to text
+3. The text is sent to Hugging Face model with fixed context
+4. Model returns answer (e.g., "New Delhi")
+5. Text is spoken back to the user via TTS
+
+---
+
+## ❌ Limitations (Free-tier)
+- Cannot use large models (>10GB) without a paid subscription
+- Model context is static; can't handle multi-turn conversation
+- Accuracy varies based on question and model quality
+
+---
+
+## 📂 Future Improvements
+- Use OpenAI/GPT models with a valid API key for better answers
+- Store history and build chat memory
+- Add voice command activation ("Hey assistant")
+- Improve UI with better microphone controls and animations
+
+---
+
+## 🔗 Helpful Resources
+- [Hugging Face Inference API Docs](https://huggingface.co/docs/api-inference/index)
+- [Flask Docs](https://flask.palletsprojects.com/)
+- [pyttsx3 TTS](https://pypi.org/project/pyttsx3/)
+- [SpeechRecognition](https://pypi.org/project/SpeechRecognition/)
+
+---
+
+## 🧠 Summary
+This project demonstrated building a full-stack voice assistant using free NLP APIs. Though constrained by model sizes and accuracy, it worked well for basic factoid questions. The modular structure and open APIs make it extensible for more advanced capabilities.

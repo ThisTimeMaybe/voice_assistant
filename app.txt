@@ -1,0 +1,38 @@
+from flask import Flask, request, jsonify
+from utils.transcriber import transcribe_audio
+from utils.responder import get_chatgpt_response
+from utils.speaker import speak_text
+import os
+
+app = Flask(__name__)
+
+@app.route('/process_audio', methods=['POST'])
+def process_audio():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file uploaded'}), 400
+
+    audio_file = request.files['audio']
+    file_path = f"temp_uploaded_{audio_file.filename}"
+    audio_file.save(file_path)
+
+    # Transcribe
+    transcription = transcribe_audio(file_path)
+    print("You said:", transcription)
+
+    # Get response
+    reply = get_chatgpt_response(transcription)
+    print("Assistant:", reply)
+
+    # Speak the response
+    speak_text(reply)
+
+    # Clean up
+    os.remove(file_path)
+
+    return jsonify({
+        'transcription': transcription,
+        'response': reply
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)
